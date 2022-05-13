@@ -64,8 +64,8 @@ public class Game extends ApplicationAdapter {
 	// Variáveis para câmera e tela.
 	private OrthographicCamera camera;
 	private Viewport viewport;
-	private final float VIRTUAL_WIDTH = 1280;
-	private final float VIRTUAL_HEIGHT = 720;
+	private final float VIRTUAL_WIDTH = 720;
+	private final float VIRTUAL_HEIGHT = 1280;
 	// Primeiro método chamdo que cria o aplicativo chamando alguns métodos.
 	@Override
 	public void create () {
@@ -165,7 +165,7 @@ public class Game extends ApplicationAdapter {
 			if (posicaoInicialVerticalPassaro > 0 || toqueTela){
 				posicaoInicialVerticalPassaro = posicaoInicialVerticalPassaro - gravidade;
 			}
-			// Aumenta a gravidade para cair mais rapido.
+			// Aumenta a gravidade para o pássaro cair.
 			gravidade++;
 		// Caso o contrário se o estado for 2:   (Quando o pássaro morre).
 		} else if (estadoJogo == 2){
@@ -237,7 +237,7 @@ public class Game extends ApplicationAdapter {
 		batch.draw(canoTopo, posicaoCanoHorizontal,
 				alturaDispositivo / 2 + espacoEntreCanos / 2 + posicaoCanoVertical);
 		// Desenha o texto da pontuação na posição X e Y.
-		textoPontuacao.draw(batch, String.valueOf(pontos), larguraDispositivo / 2,
+		textoPontuacao.draw(batch, String.valueOf(pontos), larguraDispositivo / 2 - 50,
 				alturaDispositivo - 110);
 		// Se o estado for 2:
 		if (estadoJogo == 2){
