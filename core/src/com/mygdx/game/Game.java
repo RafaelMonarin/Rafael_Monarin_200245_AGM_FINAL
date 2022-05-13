@@ -24,19 +24,19 @@ import org.w3c.dom.Text;
 import java.util.Random;
 
 public class Game extends ApplicationAdapter {
-	// Variaveis das texturas.
+	// Variáveis das texturas.
 	private SpriteBatch batch;
 	private Texture[] passaros;
 	private Texture fundo;
 	private Texture canoBaixo;
 	private Texture canoTopo;
 	private Texture gameOver;
-	// Variaveis das colisoes.
+	// Variáveis das colisões.
 	private ShapeRenderer shapeRenderer;
 	private Circle circuloPassaro;
 	private Rectangle retanguloCanoCima;
 	private Rectangle retanguloCanoBaixo;
-	// Variaveis para os valores do jogo.
+	// Variáveis para os valores do jogo.
 	private float larguraDispositivo;
 	private float alturaDispositivo;
 	private float variacao = 0;
@@ -51,28 +51,28 @@ public class Game extends ApplicationAdapter {
 	private boolean passouCano = false;
 	private int estadoJogo = 0;
 	private float posicaoHorizontalPassaro = 0;
-	// Variaveis da interface BitmapFont.
+	// Variáveis da interface BitmapFont.
 	BitmapFont textoPontuacao;
 	BitmapFont textoReiniciar;
 	BitmapFont textoMelhorPontuacao;
-	// Variaveis da interface Sound.
+	// Variáveis da interface Sound.
 	Sound somVoando;
 	Sound somColisao;
 	Sound somPontuacao;
-	// Variaveis da interface preferendes.
+	// Variáveis da interface Preferences.
 	Preferences preferences;
-	// Variaveis para camera e tela.
+	// Variáveis para câmera e tela.
 	private OrthographicCamera camera;
 	private Viewport viewport;
 	private final float VIRTUAL_WIDTH = 1280;
 	private final float VIRTUAL_HEIGHT = 720;
-	// Primeiro metodo chamdo que cria o aplicativo chamando alguns metodos.
+	// Primeiro método chamdo que cria o aplicativo chamando alguns métodos.
 	@Override
 	public void create () {
 		inicializarTexturas();
 		inicializarObjetos();
 	}
-	// Metodo que e chamado a cada frame (igual o Update() da Unity), e chama alguns metodos para serem atualizados.
+	// Método que e chamado a cada frame (igual o Update() da Unity), e chama alguns métodos para serem atualizados.
 	@Override
 	public void render () {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
@@ -82,30 +82,30 @@ public class Game extends ApplicationAdapter {
 		desenharTexturas();
 		detectarColisoes();
 	}
-	// Metodo que coloca as texturas nas variaveis criadas.
+	// Método que coloca as texturas nas variáveis criadas.
 	private void inicializarTexturas(){
-		// Textura de animacao do passaro (jogador).
+		// Textura de animação do pássaro (jogador).
 		passaros = new Texture[3];
 		passaros[0] = new Texture("passaro1.png");
 		passaros[1] = new Texture("passaro2.png");
 		passaros[2] = new Texture("passaro3.png");
-		// Texturas do cenario.
+		// Texturas do cenário.
 		fundo = new Texture("fundo.png");
 		canoBaixo = new Texture("cano_baixo_maior.png");
 		canoTopo = new Texture("cano_topo_maior.png");
 		gameOver = new Texture("game_over.png");
 	}
-	// Metodo que inicializa os objetos.
+	// Meétodo que inicializa os objetos.
 	private void inicializarObjetos(){
 		batch = new SpriteBatch();
 		random = new Random();
-		// Define a largura e a altura do dispositivo, a posicao inicial do passaro no meio da tela, a posicao do cano na direita da tela, e o espaco entre os canos.
+		// Define a largura e a altura do dispositivo, a posição inicial do pássaro no meio da tela, a posição do cano na direita da tela, e o espaço entre os canos.
 		larguraDispositivo = VIRTUAL_WIDTH;
 		alturaDispositivo = VIRTUAL_HEIGHT;
 		posicaoInicialVerticalPassaro = alturaDispositivo / 2;
 		posicaoCanoHorizontal = larguraDispositivo;
 		espacoEntreCanos = 250;
-		// Cria o texto de pontuacao com a cor branca e tamanho 10.
+		// Cria o texto de pontução com a cor branca e tamanho 10.
 		textoPontuacao = new BitmapFont();
 		textoPontuacao.setColor(Color.WHITE);
 		textoPontuacao.getData().setScale(10);
@@ -113,71 +113,71 @@ public class Game extends ApplicationAdapter {
 		textoReiniciar = new BitmapFont();
 		textoReiniciar.setColor(Color.GREEN);
 		textoReiniciar.getData().setScale(2);
-		// Cria o texto de melhor pontuacao com a cor vermelha e tamanho 2.
+		// Cria o texto de melhor pontuação com a cor vermelha e tamanho 2.
 		textoMelhorPontuacao = new BitmapFont();
 		textoMelhorPontuacao.setColor(Color.RED);
 		textoMelhorPontuacao.getData().setScale(2);
-		// Cria as colisoes.
+		// Cria as colisões.
 		shapeRenderer = new ShapeRenderer();
 		circuloPassaro = new Circle();
 		retanguloCanoBaixo = new Rectangle();
 		retanguloCanoCima = new Rectangle();
-		// Define os sons pegando eles pelos aquivos do projeto.
+		// Define os sons pegando eles pelos arquivos do projeto.
 		somVoando = Gdx.audio.newSound(Gdx.files.internal("som_asa.wav"));
 		somColisao = Gdx.audio.newSound(Gdx.files.internal("som_batida.wav"));
 		somPontuacao = Gdx.audio.newSound(Gdx.files.internal("som_pontos.wav"));
-		// Define as preferencias e a pontuacao maxima.
+		// Define as preferências e a pontuação máxima.
 		preferences = Gdx.app.getPreferences("flappyBird");
 		pontuacaoMaxima = preferences.getInteger("pontuacaoMaxima", 0);
-		// Cria e posiciona a camera e a tela com as dimensoes do aparelho.
+		// Cria e posiciona a câmera e a tela com as dimensões do aparelho.
 		camera = new OrthographicCamera();
 		camera.position.set(VIRTUAL_WIDTH / 2, VIRTUAL_HEIGHT / 2, 0);
 		viewport = new StretchViewport(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, camera);
 	}
-	// Metodo que verifica o estado do jogo.
+	// Método que verifica o estado do jogo.
 	private void verificarEstadoJogo(){
-		// Variavel booleana que detecta o click na tela.
+		// Variável booleana que detecta o click na tela.
 		boolean toqueTela = Gdx.input.justTouched();
-		// Se for o estado 0:   (Antes do primeiro Clique).
+		// Se o estado for 0:   (Antes do primeiro Clique).
 		if (estadoJogo == 0){
-			// O jogo comeca "pausado", só ouvindo se o jogador clicar na tela, e se clicar sobe o passaro (pulo), muda o estado pra 1 e executa o som de pulo.
+			// O jogo começa "pausado", só ouvindo se o jogador clicar na tela, e se clicar sobe o pássaro (pulo), muda o estado para 1 e executa o som de pulo.
 			if (toqueTela){
 				gravidade = -15;
 				estadoJogo = 1;
 				somVoando.play();
 			}
-		// Caso o contrario se o estado for 1:   (Apos o primeiro clique).
+		// Caso o contrário se o estado for 1:   (Após o primeiro clique).
 		} else if (estadoJogo == 1){
-			// Se clicar na tela sobe o passaro (pulo) e executa o som de pulo.
+			// Se clicar na tela sobe o pássaro (pulo) e executa o som de pulo.
 			if (toqueTela){
 				gravidade = -15;
 				somVoando.play();
 			}
 			// Move o cano para a esquerda.
 			posicaoCanoHorizontal -= Gdx.graphics.getDeltaTime() * 500;
-			// Se o cano sair da tela, volta ele para a direita (como se instanciasse outro), define uma altura random e seta a variavel "passouCano" para falso.
+			// Se o cano sair da tela, volta ele para a direita (como se instanciasse outro), define uma altura random e seta a váriavel "passouCano" para falso.
 			if (posicaoCanoHorizontal < -canoTopo.getWidth()){
 				posicaoCanoHorizontal = larguraDispositivo;
 				posicaoCanoVertical = random.nextInt(400) - 200;
 				passouCano = false;
 			}
-			// Se o passaro estiver no ar ou se clciar na tela, altera a posicao do passaro verticalmente.
+			// Se o pássaro estiver no ar ou se clicar na tela, altera a posição do passaro verticalmente.
 			if (posicaoInicialVerticalPassaro > 0 || toqueTela){
 				posicaoInicialVerticalPassaro = posicaoInicialVerticalPassaro - gravidade;
 			}
 			// Aumenta a gravidade para cair mais rapido.
 			gravidade++;
-		// Caso o contrario se o estado for 2:   (Quando o passaro morre).
+		// Caso o contrário se o estado for 2:   (Quando o pássaro morre).
 		} else if (estadoJogo == 2){
-			// Se os pontos atuais for maior que a pontuacao maxima (recorde), seta a pontuacao maxima com a pontuacao atual e salva no dispositivo.
+			// Se os pontos for maior que a pontuação máxima (record), seta a pontuação máxima com a pontuação atual e salva no dispositivo.
 			if (pontos > pontuacaoMaxima){
 				pontuacaoMaxima = pontos;
 				preferences.putInteger("pontuacaoMaxima", pontuacaoMaxima);
 				preferences.flush();
 			}
-			// Move o passaro pra esquerda.
+			// Move o passaro para esquerda.
 			posicaoHorizontalPassaro -= Gdx.graphics.getDeltaTime() * 500;
-			// Se clicar na tela, reinicia o jogo resetando todas as variaveis.
+			// Se clicar na tela, reinicia o jogo resetando todas as variáveis.
 			if (toqueTela){
 				estadoJogo = 0;
 				pontos = 0;
@@ -188,80 +188,96 @@ public class Game extends ApplicationAdapter {
 			}
 		}
 	}
-	// Metodo que detecta as colisoes.
+	// Método que detecta as colisões.
 	private void detectarColisoes(){
+		// Seta a posição X e Y e o raio da colisão de circulo.
 		circuloPassaro.set(
 				150 + posicaoHorizontalPassaro + passaros[0].getWidth() / 2,
 				posicaoInicialVerticalPassaro + passaros[0].getHeight() / 2,
 				passaros[0].getWidth() / 2
 		);
-
+		// Seta a posição X e Y, a altura e largura da colisão de retângulo no cano de baixo.
 		retanguloCanoBaixo.set(
 				posicaoCanoHorizontal,
 				alturaDispositivo / 2 - canoBaixo.getHeight() - espacoEntreCanos / 2 + posicaoCanoVertical,
 				canoBaixo.getWidth(), canoBaixo.getHeight()
 		);
-
+		// Seta a posição X e Y, a altura e largura da colisão de retângulo no cano de cima.
 		retanguloCanoCima.set(
 				posicaoCanoHorizontal, alturaDispositivo / 2 + espacoEntreCanos / 2 + posicaoCanoVertical,
 				canoTopo.getWidth(), canoTopo.getHeight()
 		);
-
+		// Cria um variável booleana que detecta a colisão entre os canos e o pássaro.
 		boolean colidiuCanoCima = Intersector.overlaps(circuloPassaro, retanguloCanoCima);
 		boolean colidiuCanoBaixo = Intersector.overlaps(circuloPassaro, retanguloCanoBaixo);
-		
+		// Se colidir com algum cano (de cima ou de baixo):
 		if (colidiuCanoCima || colidiuCanoBaixo){
+			// Se o estado for 1, executa o som de colisão e muda o estado do jogo para 2.
 			if (estadoJogo == 1){
 				somColisao.play();
 				estadoJogo = 2;
 			}
 		}
 	}
-
+	// Mátodo que desenha as texturas.
 	private void desenharTexturas(){
+		// Seta a matrix que sera usada.
 		batch.setProjectionMatrix(camera.combined);
+		// Seta o começo da batch para os desenhos.
 		batch.begin();
+		// Desenha a textura do fundo (cenário), na posição X e Y, e define sua largura e altura.
 		batch.draw(fundo, 0, 0, larguraDispositivo, alturaDispositivo);
+		// Desenha a textura do pássaro na posição X e Y.
 		batch.draw(passaros[(int) variacao],
 				150 + posicaoHorizontalPassaro, posicaoInicialVerticalPassaro);
+		// Desenha o cano de baixo, na posição X e Y.
 		batch.draw(canoBaixo, posicaoCanoHorizontal,
 				alturaDispositivo / 2 - canoBaixo.getHeight() - espacoEntreCanos / 2 + posicaoCanoVertical);
+		// Desenha o cano de cima, na posição X e Y.
 		batch.draw(canoTopo, posicaoCanoHorizontal,
 				alturaDispositivo / 2 + espacoEntreCanos / 2 + posicaoCanoVertical);
+		// Desenha o texto da pontuação na posição X e Y.
 		textoPontuacao.draw(batch, String.valueOf(pontos), larguraDispositivo / 2,
 				alturaDispositivo - 110);
-
+		// Se o estado for 2:
 		if (estadoJogo == 2){
+			// Desenha o texto de game over na posição X e Y.
 			batch.draw(gameOver, larguraDispositivo / 2 - gameOver.getWidth() / 2,
 					alturaDispositivo / 2);
+			// Desenha o texto de reinicar na posição X e Y, mostrando seu record.
 			textoReiniciar.draw(batch,
 					"Seu record é: " + pontuacaoMaxima + " pontos",
 					larguraDispositivo / 2 - 140, alturaDispositivo / 2 - gameOver.getHeight());
 		}
+		// Seta o fim da batch para os desenhos.
 		batch.end();
 	}
-
+	// Método que valida os pontos.
 	public void validarPontos(){
+		// Se o cano passar pelo pássaro:
 		if (posicaoCanoHorizontal < 150 - passaros[0].getWidth()){
+			// Se a variával "passouCano" for falsa, soma 1 ponto, seta a variável verdadeira e executa o som de pontuação.
+			// (A variável serve para executar apenaz uma vez essa condição quando o cano passar pelo pássaro, até que a variável seja resetada pelo estado 1).
 			if (!passouCano){
 				pontos++;
 				passouCano = true;
 				somPontuacao.play();
 			}
 		}
-
+		// Velocidade que vai trocar as texturas do pássaro para a animação.
 		variacao += Gdx.graphics.getDeltaTime() * 10;
-
+		// Se a variavel "variacao" for maior que 3, volta o valor para 0.
+		// (0 = primeira textura da animação, 3 = ultima textura da animação).
 		if (variacao > 3){
 			variacao = 0;
 		}
 	}
-
+	// Método para fazer o resize da tela.
 	@Override
 	public void resize(int width, int height){
 		viewport.update(width, height);
 	}
-
+	// Método chamado quando o aplicativo é destruído.
 	@Override
 	public void dispose(){
 
