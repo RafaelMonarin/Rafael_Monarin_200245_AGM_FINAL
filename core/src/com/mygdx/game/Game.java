@@ -31,9 +31,11 @@ public class Game extends ApplicationAdapter {
 	private Texture canoBaixo;
 	private Texture canoTopo;
 	private Texture gameOver;
+	private Texture[] coin;
 	// Variáveis das colisões.
 	private ShapeRenderer shapeRenderer;
 	private Circle circuloPassaro;
+	private Circle circuloCoin;
 	private Rectangle retanguloCanoCima;
 	private Rectangle retanguloCanoBaixo;
 	// Variáveis para os valores do jogo.
@@ -45,10 +47,15 @@ public class Game extends ApplicationAdapter {
 	private float posicaoCanoHorizontal;
 	private float posicaoCanoVertical;
 	private float espacoEntreCanos;
+	private float posicaoCoinHorizontal;
+	private float posicaoCoinVertical;
 	private Random random;
 	private int pontos = 0;
 	private int pontuacaoMaxima = 0;
 	private boolean passouCano = false;
+	private boolean coletouCoin = false;
+	private boolean colidiuCoin = false;
+	private int coinType;
 	private int estadoJogo = 0;
 	private float posicaoHorizontalPassaro = 0;
 	// Variáveis da interface BitmapFont.
@@ -59,6 +66,7 @@ public class Game extends ApplicationAdapter {
 	Sound somVoando;
 	Sound somColisao;
 	Sound somPontuacao;
+	Sound somCoin;
 	// Variáveis da interface Preferences.
 	Preferences preferences;
 	// Variáveis para câmera e tela.
@@ -86,14 +94,18 @@ public class Game extends ApplicationAdapter {
 	private void inicializarTexturas(){
 		// Textura de animação do pássaro (jogador).
 		passaros = new Texture[3];
-		passaros[0] = new Texture("passaro1.png");
-		passaros[1] = new Texture("passaro2.png");
-		passaros[2] = new Texture("passaro3.png");
+		passaros[0] = new Texture("AngryBird1.png");
+		passaros[1] = new Texture("AngryBird2.png");
+		passaros[2] = new Texture("AngryBird3.png");
 		// Texturas do cenário.
 		fundo = new Texture("fundo.png");
 		canoBaixo = new Texture("cano_baixo_maior.png");
 		canoTopo = new Texture("cano_topo_maior.png");
 		gameOver = new Texture("game_over.png");
+		// Textura das moedas;
+		coin = new Texture[2];
+		coin[0] = new Texture("SilverCoin.png");
+		coin[1] = new Texture("GoldCoin.png");
 	}
 	// Meétodo que inicializa os objetos.
 	private void inicializarObjetos(){
@@ -104,6 +116,8 @@ public class Game extends ApplicationAdapter {
 		alturaDispositivo = VIRTUAL_HEIGHT;
 		posicaoInicialVerticalPassaro = alturaDispositivo / 2;
 		posicaoCanoHorizontal = larguraDispositivo;
+		posicaoCoinVertical = alturaDispositivo / 2;
+		posicaoCoinHorizontal = larguraDispositivo;
 		espacoEntreCanos = 250;
 		// Cria o texto de pontução com a cor branca e tamanho 10.
 		textoPontuacao = new BitmapFont();
@@ -120,12 +134,14 @@ public class Game extends ApplicationAdapter {
 		// Cria as colisões.
 		shapeRenderer = new ShapeRenderer();
 		circuloPassaro = new Circle();
+		circuloCoin = new Circle();
 		retanguloCanoBaixo = new Rectangle();
 		retanguloCanoCima = new Rectangle();
 		// Define os sons pegando eles pelos arquivos do projeto.
 		somVoando = Gdx.audio.newSound(Gdx.files.internal("som_asa.wav"));
 		somColisao = Gdx.audio.newSound(Gdx.files.internal("som_batida.wav"));
 		somPontuacao = Gdx.audio.newSound(Gdx.files.internal("som_pontos.wav"));
+		somCoin = Gdx.audio.newSound(Gdx.files.internal("coin.wav"));
 		// Define as preferências e a pontuação máxima.
 		preferences = Gdx.app.getPreferences("flappyBird");
 		pontuacaoMaxima = preferences.getInteger("pontuacaoMaxima", 0);
@@ -155,11 +171,18 @@ public class Game extends ApplicationAdapter {
 			}
 			// Move o cano para a esquerda.
 			posicaoCanoHorizontal -= Gdx.graphics.getDeltaTime() * 500;
+			posicaoCoinHorizontal -= Gdx.graphics.getDeltaTime() * 500;
 			// Se o cano sair da tela, volta ele para a direita (como se instanciasse outro), define uma altura random e seta a váriavel "passouCano" para falso.
 			if (posicaoCanoHorizontal < -canoTopo.getWidth()){
 				posicaoCanoHorizontal = larguraDispositivo;
 				posicaoCanoVertical = random.nextInt(400) - 200;
 				passouCano = false;
+			}
+			if (posicaoCoinHorizontal < -coin[0].getWidth()){
+				posicaoCoinHorizontal = larguraDispositivo + random.nextInt(500);
+				posicaoCoinVertical = random.nextInt(800) - 400;
+				coletouCoin = false;
+				coinType = random.nextInt(2);
 			}
 			// Se o pássaro estiver no ar ou se clicar na tela, altera a posição do passaro verticalmente.
 			if (posicaoInicialVerticalPassaro > 0 || toqueTela){
@@ -185,6 +208,7 @@ public class Game extends ApplicationAdapter {
 				posicaoHorizontalPassaro = 0;
 				posicaoInicialVerticalPassaro = alturaDispositivo / 2;
 				posicaoCanoHorizontal = larguraDispositivo;
+				posicaoCoinHorizontal = larguraDispositivo;
 			}
 		}
 	}
@@ -207,9 +231,12 @@ public class Game extends ApplicationAdapter {
 				posicaoCanoHorizontal, alturaDispositivo / 2 + espacoEntreCanos / 2 + posicaoCanoVertical,
 				canoTopo.getWidth(), canoTopo.getHeight()
 		);
+		// Seta a posição X e Y e o raio da colisão de circulo.
+		circuloCoin.set(posicaoCoinHorizontal, posicaoCoinVertical, coin[0].getWidth() / 2);
 		// Cria um variável booleana que detecta a colisão entre os canos e o pássaro.
 		boolean colidiuCanoCima = Intersector.overlaps(circuloPassaro, retanguloCanoCima);
 		boolean colidiuCanoBaixo = Intersector.overlaps(circuloPassaro, retanguloCanoBaixo);
+		colidiuCoin = Intersector.overlaps(circuloPassaro, circuloCoin);
 		// Se colidir com algum cano (de cima ou de baixo):
 		if (colidiuCanoCima || colidiuCanoBaixo){
 			// Se o estado for 1, executa o som de colisão e muda o estado do jogo para 2.
@@ -236,6 +263,8 @@ public class Game extends ApplicationAdapter {
 		// Desenha o cano de cima, na posição X e Y.
 		batch.draw(canoTopo, posicaoCanoHorizontal,
 				alturaDispositivo / 2 + espacoEntreCanos / 2 + posicaoCanoVertical);
+		// Desenha a moeda na posição X e Y.
+		batch.draw(coin[coinType], posicaoCoinHorizontal, posicaoCoinVertical);
 		// Desenha o texto da pontuação na posição X e Y.
 		textoPontuacao.draw(batch, String.valueOf(pontos), larguraDispositivo / 2 - 50,
 				alturaDispositivo - 110);
@@ -262,6 +291,21 @@ public class Game extends ApplicationAdapter {
 				pontos++;
 				passouCano = true;
 				somPontuacao.play();
+			}
+		}
+		// Se colidiu com a moeda e nao coletou ela:
+		if(colidiuCoin && !coletouCoin){
+			// Dependendo do tipo da moeda, adiciona uma quantidade de pontos diferentes e toca um som.
+			coletouCoin = true;
+			colidiuCoin = false;
+			somCoin.play();
+			switch (coinType){
+				case 0:
+					pontos += 5;
+					break;
+				case 1:
+					pontos += 10;
+					break;
 			}
 		}
 		// Velocidade que vai trocar as texturas do pássaro para a animação.
