@@ -117,7 +117,7 @@ public class Game extends ApplicationAdapter {
 		posicaoInicialVerticalPassaro = alturaDispositivo / 2;
 		posicaoCanoHorizontal = larguraDispositivo;
 		posicaoCoinVertical = alturaDispositivo / 2;
-		posicaoCoinHorizontal = larguraDispositivo;
+		posicaoCoinHorizontal = larguraDispositivo + larguraDispositivo / 2;
 		espacoEntreCanos = 250;
 		// Cria o texto de pontução com a cor branca e tamanho 10.
 		textoPontuacao = new BitmapFont();
@@ -179,7 +179,7 @@ public class Game extends ApplicationAdapter {
 				passouCano = false;
 			}
 			if (posicaoCoinHorizontal < -coin[0].getWidth()){
-				posicaoCoinHorizontal = larguraDispositivo + random.nextInt(500);
+				posicaoCoinHorizontal = larguraDispositivo;
 				posicaoCoinVertical = random.nextInt((int)alturaDispositivo);
 				coletouCoin = false;
 				coinType = random.nextInt(2);
@@ -208,7 +208,8 @@ public class Game extends ApplicationAdapter {
 				posicaoHorizontalPassaro = 0;
 				posicaoInicialVerticalPassaro = alturaDispositivo / 2;
 				posicaoCanoHorizontal = larguraDispositivo;
-				posicaoCoinHorizontal = larguraDispositivo;
+				posicaoCoinHorizontal = larguraDispositivo + larguraDispositivo / 2;
+				posicaoCoinVertical = alturaDispositivo / 2;
 			}
 		}
 	}
