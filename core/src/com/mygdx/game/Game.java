@@ -175,7 +175,7 @@ public class Game extends ApplicationAdapter {
 			// Se o cano sair da tela, volta ele para a direita (como se instanciasse outro), define uma altura random e seta a váriavel "passouCano" para falso.
 			if (posicaoCanoHorizontal < -canoTopo.getWidth()){
 				posicaoCanoHorizontal = larguraDispositivo;
-				posicaoCanoVertical = random.nextInt(400) - 200;
+				posicaoCanoVertical = random.nextInt( 400) - 200;
 				passouCano = false;
 			}
 			if (posicaoCoinHorizontal < -coin[0].getWidth()){
