@@ -180,7 +180,7 @@ public class Game extends ApplicationAdapter {
 			}
 			if (posicaoCoinHorizontal < -coin[0].getWidth()){
 				posicaoCoinHorizontal = larguraDispositivo + random.nextInt(500);
-				posicaoCoinVertical = random.nextInt(800) - 400;
+				posicaoCoinVertical = random.nextInt((int)alturaDispositivo);
 				coletouCoin = false;
 				coinType = random.nextInt(2);
 			}
@@ -232,6 +232,7 @@ public class Game extends ApplicationAdapter {
 				canoTopo.getWidth(), canoTopo.getHeight()
 		);
 		// Seta a posição X e Y e o raio da colisão de circulo.
+
 		circuloCoin.set(posicaoCoinHorizontal, posicaoCoinVertical, coin[0].getWidth() / 2);
 		// Cria um variável booleana que detecta a colisão entre os canos e o pássaro.
 		boolean colidiuCanoCima = Intersector.overlaps(circuloPassaro, retanguloCanoCima);
