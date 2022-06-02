@@ -117,7 +117,7 @@ public class Game extends ApplicationAdapter {
 		posicaoInicialVerticalPassaro = alturaDispositivo / 2;
 		posicaoCanoHorizontal = larguraDispositivo;
 		posicaoCoinVertical = alturaDispositivo / 2;
-		posicaoCoinHorizontal = larguraDispositivo + larguraDispositivo / 2;
+		posicaoCoinHorizontal = larguraDispositivo * 1.5f + canoBaixo.getWidth();
 		espacoEntreCanos = 250;
 		// Cria o texto de pontução com a cor branca e tamanho 10.
 		textoPontuacao = new BitmapFont();
@@ -178,9 +178,10 @@ public class Game extends ApplicationAdapter {
 				posicaoCanoVertical = random.nextInt( 400) - 200;
 				passouCano = false;
 			}
-			if (posicaoCoinHorizontal < -coin[0].getWidth()){
+			// Se a moeda sair da tela, volta ela para a direita (como se instanciasse outra), define uma altura random e seta a váriavel "coletouCoin" para falso.
+			if (posicaoCoinHorizontal < -coin[0].getWidth() * 3){
 				posicaoCoinHorizontal = larguraDispositivo;
-				posicaoCoinVertical = random.nextInt((int)alturaDispositivo);
+				posicaoCoinVertical = random.nextInt((int)alturaDispositivo - 300) + 150;
 				coletouCoin = false;
 				coinType = random.nextInt(2);
 			}
@@ -208,7 +209,7 @@ public class Game extends ApplicationAdapter {
 				posicaoHorizontalPassaro = 0;
 				posicaoInicialVerticalPassaro = alturaDispositivo / 2;
 				posicaoCanoHorizontal = larguraDispositivo;
-				posicaoCoinHorizontal = larguraDispositivo + larguraDispositivo / 2;
+				posicaoCoinHorizontal = larguraDispositivo * 1.5f + canoBaixo.getWidth();
 				posicaoCoinVertical = alturaDispositivo / 2;
 			}
 		}
@@ -233,8 +234,7 @@ public class Game extends ApplicationAdapter {
 				canoTopo.getWidth(), canoTopo.getHeight()
 		);
 		// Seta a posição X e Y e o raio da colisão de circulo.
-
-		circuloCoin.set(posicaoCoinHorizontal, posicaoCoinVertical, coin[0].getWidth() / 2);
+		circuloCoin.set(posicaoCoinHorizontal, posicaoCoinVertical, coin[0].getWidth());
 		// Cria um variável booleana que detecta a colisão entre os canos e o pássaro.
 		boolean colidiuCanoCima = Intersector.overlaps(circuloPassaro, retanguloCanoCima);
 		boolean colidiuCanoBaixo = Intersector.overlaps(circuloPassaro, retanguloCanoBaixo);
@@ -275,8 +275,12 @@ public class Game extends ApplicationAdapter {
 			// Desenha o texto de game over na posição X e Y.
 			batch.draw(gameOver, larguraDispositivo / 2 - gameOver.getWidth() / 2,
 					alturaDispositivo / 2);
-			// Desenha o texto de reinicar na posição X e Y, mostrando seu record.
+			// Desenha o texto de reinicar na posição X e Y.
 			textoReiniciar.draw(batch,
+					"Toque para reiniciar!", larguraDispositivo / 2 - 140,
+					alturaDispositivo / 2 - gameOver.getHeight() / 2);
+			// Desenha o texto do seu record na posição X e Y.
+			textoMelhorPontuacao.draw(batch,
 					"Seu record é: " + pontuacaoMaxima + " pontos",
 					larguraDispositivo / 2 - 140, alturaDispositivo / 2 - gameOver.getHeight());
 		}
@@ -297,7 +301,7 @@ public class Game extends ApplicationAdapter {
 		}
 		// Se colidiu com a moeda e nao coletou ela:
 		if(colidiuCoin && !coletouCoin){
-			// Dependendo do tipo da moeda, adiciona uma quantidade de pontos diferentes e toca um som.
+			// Dependendo do tipo da moeda, adiciona uma quantidade de pontos diferentes, toca um som e reseta as variáveis da moeda para a direita.
 			coletouCoin = true;
 			colidiuCoin = false;
 			somCoin.play();
@@ -309,6 +313,10 @@ public class Game extends ApplicationAdapter {
 					pontos += 10;
 					break;
 			}
+			posicaoCoinHorizontal = posicaoCoinHorizontal * 1.5f + larguraDispositivo;
+			posicaoCoinVertical = random.nextInt((int)alturaDispositivo - 300) + 150;
+			coletouCoin = false;
+			coinType = random.nextInt(2);
 		}
 		// Velocidade que vai trocar as texturas do pássaro para a animação.
 		variacao += Gdx.graphics.getDeltaTime() * 10;
